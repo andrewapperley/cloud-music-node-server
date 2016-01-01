@@ -11,12 +11,13 @@ module.exports = function() {
 
     client.updateWithChanges = function(client, changes) {
         _.forIn(changes, function(value, key) {
-            if (_.includes_(publicProps, key)) {
+            if (_.includes(_publicProps, key)) {
                 client[key] = value;
             } else {
                 console.log("Web Client attempted to update: " + key + " on Client: " + client._id);
             }
         });
+        return client;
     };
 
     client.validateName = function(name) {

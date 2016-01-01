@@ -42,7 +42,7 @@ module.exports = function(router) {
       deleted: false
     }).then(function(client) {
       if (client) {
-        client.updateWithChanges(changes);
+        client = client.updateWithChanges(changes);
         client.save().then(function(client) {
           res.json({
             status: true,

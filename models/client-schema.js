@@ -4,7 +4,6 @@ var Schema = require('mongoose').Schema,
     crypto = require('../lib/crypto');
 
 var _schema = {
-    logo: {type: Schema.Types.ObjectId, ref: "Media"},
     name: {type: String, required: true, unique: true},
     email: {type: String, required: true},
     password: {type: String, required: true},
