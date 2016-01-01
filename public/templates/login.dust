@@ -1,0 +1,18 @@
+{>"layouts/public" /}
+
+{<body}
+    <p>Login Page</p>
+
+    <form method="post" action="/login">
+
+        <input type="hidden" value="{_csrf}" name="_csrf" />
+
+        <label for="login-email">Email</label><br />
+        <input type="email" id="login-email" name="username" placeholder="joe@funeralhome.ca" /><br /><br />
+
+        <label for="login-password">Password</label><br />
+        <input type="password" id="login-password" name="password" placeholder="*******" /><br /><br />
+
+        <input type="submit" name="login-submit" />
+    </form>
+{/body}

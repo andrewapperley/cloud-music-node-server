@@ -1,0 +1,23 @@
+{>"layouts/public" /}
+
+{<body}
+    <p>Register Page</p>
+
+
+    <form method="post" action="/register">
+
+        <input type="hidden" value="{_csrf}" name="_csrf" />
+
+        <label for="register-name">Name</label><br />
+        <input type="text" id="register-name" name="name" placeholder="Cool Funeral Home" /><br /><br />
+
+        <label for="register-email">Email</label><br />
+        <input type="email" id="register-email" name="email" placeholder="joe@funeralhome.ca" /><br /><br />
+
+        <label for="register-password">Password</label><br />
+        <input type="password" id="register-password" name="password" placeholder="*******" /><br /><br />
+
+        <input type="submit" name="register-submit" />
+    </form>
+
+{/body}

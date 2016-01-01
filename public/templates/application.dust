@@ -1,0 +1,5 @@
+{>"layouts/application" /}
+
+{<body}
+    <div id="application"></div>
+{/body}

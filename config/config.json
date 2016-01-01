@@ -1,0 +1,84 @@
+{
+
+
+    "mongo" : {
+        "host" : "localhost",
+        "port" : "27017",
+        "database" : "cloudMusicDevelopment"
+    },
+
+    "express": {
+        "view cache": false,
+        "view engine": "js",
+        "views": "path:./.build/templates"
+    },
+
+
+
+    "view engines": {
+        "js": {
+            "module": "engine-munger",
+            "renderer": {
+                "method": "js",
+                "arguments": [
+                    { "cache": true },
+                    {
+                        "views": "config:express.views",
+                        "view engine": "config:express.view engine",
+                        "specialization": "config:specialization",
+                        "i18n": "config:i18n"
+                    }
+                ]
+            }
+        }
+    },
+
+
+    "bcrypt": {
+        "difficulty": 8
+    },
+
+    "i18n": {
+        "contentPath": "path:./locales",
+        "fallback": "en-US"
+    },
+
+
+    "specialization": {
+    },
+
+    "middleware": {
+
+
+        "expressView": {
+            "priority": 100,
+            "enabled": true,
+            "module": {
+                "name": "engine-munger/lib/expressView"
+            }
+        },
+
+
+        "static": {
+            "module": {
+                "arguments": [ "path:./.build" ]
+            }
+        },
+
+        "router": {
+            "module": {
+                "arguments": [{ "directory": "path:./controllers" }]
+            }
+        },
+
+        "flash": {
+            "priority": 91,
+            "enabled": true,
+            "module": {
+                "name": "connect-flash",
+                "method": "flash"
+            }
+        }
+
+    }
+}
