@@ -1,7 +1,7 @@
 {
   "name": "cloud-music-server",
   "version": "0.1.0",
-  "description": "CloudMusic Print Server",
+  "description": "CloudMusic Server",
   "author": "Andrew Apperley",
   "main": "index.js",
   "scripts": {
@@ -31,9 +31,11 @@
     "passport": "^0.3.2",
     "passport-local": "^1.0.0",
     "react": "^0.13.*",
+    "react-dropzone": "^2.2.4",
     "react-mini-router": "^1.1.7",
     "reactify": "^1.1.1",
     "superagent": "^1.4.0",
+    "superagent-jsonapify": "^1.4.1",
     "walk": "^2.3.9"
   },
   "devDependencies": {

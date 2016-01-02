@@ -1,7 +1,8 @@
 
-var Index = require('./manager/views/index');
+var Music = require('./manager/views/music/index');
 var React = require('react');
 var RouterMixin = require('react-mini-router').RouterMixin;
+var navigate = require('react-mini-router').navigate;
 var Fluxxor = require('fluxxor');
 var FluxMixin = Fluxxor.FluxMixin(React);
 var StoreWatchMixin = Fluxxor.StoreWatchMixin;
@@ -17,7 +18,9 @@ var Application = React.createClass({
     },
 
     routes: {
-        '/': 'index'
+        '/': 'index',
+        '/music/:nested': 'music',
+        '/music': 'music'
     },
 
     render: function() {
@@ -26,7 +29,15 @@ var Application = React.createClass({
 
     index: function() {
         return (
-            <Index />
+            <div>
+                <p>Application Index</p>
+            </div>
+        );
+    },
+
+    music: function() {
+        return (
+            <Music root="/application/music"/>
         );
     },
 
@@ -51,6 +62,6 @@ var flux = new Fluxxor.Flux({
 });
 
 React.render(
-    App({flux: flux}),
+    App({flux: flux, history: true, root: "/application"}),
     document.getElementById('application')
 );
