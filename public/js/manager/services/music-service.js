@@ -3,13 +3,16 @@ var request = require('superagent');
 module.exports = {
 
     uploadMusic: function(files, callback) {
-        request
-            .post('/application/music/upload')
-            .send({data: files, _csrf: window.csrf})
+        var req = request.post('/application/music/upload');
+        files.forEach((file)=> {
+            req.attach(file.name, file, file.name+".mp3");
+        });
+        req
             .set('Accept', 'application/json')
             .end(function(err, res){
                 callback(err, res.body);
             });
+
     }
 
 };

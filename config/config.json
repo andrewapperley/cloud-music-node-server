@@ -50,6 +50,21 @@
     "middleware": {
 
 
+        "appsec": {
+            "priority": 110,
+            "module": {
+                "name": "lusca",
+                "arguments": [
+                    {
+                        "csrf": false,
+                        "xframe": false,
+                        "p3p": false,
+                        "csp": false
+                    }
+                ]
+            }
+        },
+
         "expressView": {
             "priority": 100,
             "enabled": true,
@@ -77,6 +92,64 @@
             "module": {
                 "name": "connect-flash",
                 "method": "flash"
+            }
+        },
+        "json": {
+            "enabled": true,
+            "priority": 10,
+            "module": {
+                "name": "body-parser",
+                "method": "json",
+                "arguments": [
+                    {
+                        "limit": 52428800
+                    }
+                ]
+            }
+        },
+        "raw": {
+            "enabled": true,
+            "priority": 10,
+            "module": {
+                "name": "body-parser",
+                "method": "raw",
+                "arguments": [
+                    {
+                        "limit": 52428800
+                    }
+                ]
+            }
+        },
+        "text": {
+            "enabled": true,
+            "priority": 10,
+            "module": {
+                "name": "body-parser",
+                "method": "text",
+                "arguments": [
+                    {
+                        "limit": 52428800
+                    }
+                ]
+            }
+        },
+        "multipart": {
+            "enabled": false,
+            "priority": 150,
+            "module": {
+                "name": "kraken-js/middleware/multipart"
+            }
+        },
+        "multer": {
+            "priority": 110,
+            "enabled": true,
+            "module": {
+                "name": "multer",
+                "arguments": [
+                    {
+                        "dest": "path:./public/uploads/media"
+                    }
+                ]
             }
         }
 
