@@ -1,12 +1,12 @@
 
 var Schema = require('mongoose').Schema;
+var findOrCreate = require('mongoose-findorcreate');
 
 var _schema = {
-    owner: {type: Schema.Types.ObjectId, ref: "Client", required: true, index: true},
+    //owner: {type: Schema.Types.ObjectId, ref: "Client", required: true, index: true},
     album: {type: Schema.Types.ObjectId, ref: "Album", required: true, index: true},
     name: {type: String, required: true, index: true},
-    genre: {type: String},
-    length: {type: Number},
+    genre: {type: Array},
     track: {type: Number}
 };
 
@@ -17,6 +17,8 @@ module.exports = function() {
     /**
      * Attach any static functions here
      */
+
+    schema.plugin(findOrCreate);
 
     return schema;
 }();
