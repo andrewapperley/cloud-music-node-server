@@ -23,6 +23,7 @@
     "engine-munger": "^0.2.8",
     "express": "^4.12.2",
     "fluxxor": "^1.7.3",
+    "fs-extended": "^0.2.1",
     "kraken-js": "^1.0.3",
     "localizr": "^0.1.6",
     "lodash": "^3.10.1",
