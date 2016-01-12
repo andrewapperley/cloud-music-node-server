@@ -50,6 +50,31 @@
     "middleware": {
 
 
+        "session": {
+            "enabled": true,
+            "priority": 100,
+            "module": {
+                "name": "path:./lib/redis-session",
+                "arguments": [
+                    {
+                        "secret": "3fbfc2945e919f336d215bdeb0648005b69c43dc",
+                        "key": "sid",
+                        "saveUninitialized": true,
+                        "resave": true,
+                        "cookie": {
+                            "secure": false,
+                            "httpOnly": true,
+                            "path": "/",
+                            "maxAge": 31556926000
+                        }
+                    },
+                    {
+                        /* redis config */
+                    }
+                ]
+            }
+        },
+
         "appsec": {
             "priority": 110,
             "module": {
@@ -57,9 +82,9 @@
                 "arguments": [
                     {
                         "csrf": false,
-                        "xframe": false,
-                        "p3p": false,
-                        "csp": false
+                        "xframe": true,
+                        "p3p": true,
+                        "csp": true
                     }
                 ]
             }
@@ -150,6 +175,15 @@
                         "dest": "path:./public/uploads/media"
                     }
                 ]
+            }
+        },
+        "injectUser": {
+            "enabled": true,
+            "priority": 111,
+            "route": "/application",
+            "module": {
+                "name":"path:./lib/authentication",
+                "method": "injectUser"
             }
         }
 

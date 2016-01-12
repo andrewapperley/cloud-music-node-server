@@ -2,9 +2,9 @@
 
 var React = require('react');
 var RouterMixin = require('react-mini-router').RouterMixin;
-var navigate = require('react-mini-router').navigate;
 var Fluxxor = require('fluxxor');
 var MusicUpload = require('./components/upload');
+var MusicList = require('./components/list');
 
 var Music = React.createClass({
 
@@ -12,6 +12,7 @@ var Music = React.createClass({
 
     routes: {
         '/': 'index',
+        '/list': 'list',
         '/upload': 'upload'
     },
 
@@ -24,6 +25,12 @@ var Music = React.createClass({
              <div>
                 <p>Music Index</p>
              </div>
+        );
+    },
+
+    list: function() {
+        return (
+            <MusicList />
         );
     },
 

@@ -2,6 +2,7 @@
 
 var ProcessUpload = require('../../../lib/process-upload');
 var _ = require('lodash');
+var Promise = require('bluebird');
 
 module.exports = function (router) {
 
@@ -28,6 +29,16 @@ module.exports = function (router) {
                     });
                 });
         }
+    });
+
+    router.get('/getMusic', function(req, res) {
+        Promise.all(promises)
+            .spread(function(songs, albums, artists) {
+
+            })
+            .catch(function(error) {
+
+            });
     });
 
 };

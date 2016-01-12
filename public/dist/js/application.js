@@ -38724,7 +38724,7 @@ React.render(
     document.getElementById('application')
 );
 
-},{"./manager/actions/client-actions":269,"./manager/actions/music-actions":270,"./manager/stores/client-store":274,"./manager/stores/music-store":275,"./manager/views/music/index":277,"fluxxor":1,"react":264,"react-mini-router":102}],269:[function(require,module,exports){
+},{"./manager/actions/client-actions":269,"./manager/actions/music-actions":270,"./manager/stores/client-store":274,"./manager/stores/music-store":275,"./manager/views/music/index":278,"fluxxor":1,"react":264,"react-mini-router":102}],269:[function(require,module,exports){
 var constants = require('../constants');
 var clientService = require('../services/client-service');
 
@@ -38877,6 +38877,28 @@ module.exports = Fluxxor.createStore({
 
 var React = require('react');
 var Fluxxor = require('fluxxor');
+
+var List = React.createClass({displayName: "List",
+
+    mixins: [Fluxxor.FluxMixin(React)],
+
+    render: function() {
+        return (
+            React.createElement("div", null, 
+                React.createElement("p", null, "List")
+
+            )
+        );
+    }
+});
+
+module.exports = List;
+
+},{"fluxxor":1,"react":264}],277:[function(require,module,exports){
+'use strict';
+
+var React = require('react');
+var Fluxxor = require('fluxxor');
 var Dropzone = require('react-dropzone');
 
 var Upload = React.createClass({displayName: "Upload",
@@ -38901,14 +38923,14 @@ var Upload = React.createClass({displayName: "Upload",
 
 module.exports = Upload;
 
-},{"fluxxor":1,"react":264,"react-dropzone":100}],277:[function(require,module,exports){
+},{"fluxxor":1,"react":264,"react-dropzone":100}],278:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
 var RouterMixin = require('react-mini-router').RouterMixin;
-var navigate = require('react-mini-router').navigate;
 var Fluxxor = require('fluxxor');
 var MusicUpload = require('./components/upload');
+var MusicList = require('./components/list');
 
 var Music = React.createClass({displayName: "Music",
 
@@ -38916,6 +38938,7 @@ var Music = React.createClass({displayName: "Music",
 
     routes: {
         '/': 'index',
+        '/list': 'list',
         '/upload': 'upload'
     },
 
@@ -38928,6 +38951,12 @@ var Music = React.createClass({displayName: "Music",
              React.createElement("div", null, 
                 React.createElement("p", null, "Music Index")
              )
+        );
+    },
+
+    list: function() {
+        return (
+            React.createElement(MusicList, null)
         );
     },
 
@@ -38949,4 +38978,4 @@ var Music = React.createClass({displayName: "Music",
 
 module.exports = Music;
 
-},{"./components/upload":276,"fluxxor":1,"react":264,"react-mini-router":102}]},{},[268]);
+},{"./components/list":276,"./components/upload":277,"fluxxor":1,"react":264,"react-mini-router":102}]},{},[268]);
