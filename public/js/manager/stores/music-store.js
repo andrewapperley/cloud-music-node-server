@@ -8,15 +8,17 @@ module.exports = Fluxxor.createStore({
         this.loading = false;
         this.error = null;
         this.music = options.music || {
-                artists: [],
-                albums: [],
-                songs: []
+
             };
 
         this.bindActions(
             constants.UPLOAD_MUSIC, this.onUploadMusic,
             constants.UPLOAD_MUSIC_SUCCESS, this.onUploadMusicSuccess,
-            constants.UPLOAD_MUSIC_FAILURE, this.onUploadMusicFailure
+            constants.UPLOAD_MUSIC_FAILURE, this.onUploadMusicFailure,
+
+            constants.LIST_MUSIC, this.onGetMusicList,
+            constants.LIST_MUSIC_SUCCESS, this.onGetMusicListSuccess,
+            constants.LIST_MUSIC_FAILURE, this.onGetMusicListFailure
         );
     },
 
@@ -26,15 +28,32 @@ module.exports = Fluxxor.createStore({
     },
 
     onUploadMusicSuccess: function(payload) {
-        var _this = this;
-        _this.loading = false;
-        console.log(payload);
+        this.loading = false;
+        this.emit("change");
     },
 
     onUploadMusicFailure: function(payload) {
         this.loading = false;
+        this.error = payload.error;
         this.emit("change");
-        console.log(payload);
+
+    },
+
+    onGetMusicList: function() {
+        this.loading = true;
+        this.emit("change");
+    },
+
+    onGetMusicListSuccess: function(payload) {
+        this.loading = false;
+        this.music = payload;
+        this.emit("change");
+    },
+
+    onGetMusicListFailure: function(payload) {
+        this.loading = false;
+        this.error = payload.error;
+        this.emit("change");
     },
 
     getState: function() {

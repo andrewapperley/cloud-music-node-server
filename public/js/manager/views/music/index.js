@@ -5,15 +5,23 @@ var RouterMixin = require('react-mini-router').RouterMixin;
 var Fluxxor = require('fluxxor');
 var MusicUpload = require('./components/upload');
 var MusicList = require('./components/list');
+var StoreWatchMixin = Fluxxor.StoreWatchMixin;
 
 var Music = React.createClass({
 
-    mixins: [RouterMixin, Fluxxor.FluxMixin(React)],
+    mixins: [RouterMixin, Fluxxor.FluxMixin(React), StoreWatchMixin('MusicStore')],
 
     routes: {
         '/': 'index',
         '/list': 'list',
         '/upload': 'upload'
+    },
+
+
+    getStateFromFlux: function() {
+        return {
+            musicStore: this.getFlux().store('MusicStore').getState()
+        }
     },
 
     render: function() {
@@ -30,7 +38,7 @@ var Music = React.createClass({
 
     list: function() {
         return (
-            <MusicList />
+            <MusicList musicStore={this.state.musicStore}/>
         );
     },
 

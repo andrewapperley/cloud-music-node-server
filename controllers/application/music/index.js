@@ -34,10 +34,10 @@ module.exports = function (router) {
         }
     });
 
-    router.get('/getMusic', function(req, res) {
+    router.post('/list', function(req, res) {
         var promises = [
-            SongModel.find({owner: req.user._id}),
-            AlbumModel.find({owner: req.user._id}),
+            SongModel.find({owner: req.user._id}).populate("album artist"),
+            AlbumModel.find({owner: req.user._id}).populate("artist"),
             ArtistModel.find({owner: req.user._id})
         ];
         Promise.all(promises)

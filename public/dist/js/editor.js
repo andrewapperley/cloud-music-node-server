@@ -38686,6 +38686,20 @@ module.exports = {
             }
             _this.dispatch(constants.UPLOAD_MUSIC_SUCCESS, response.data.music);
         });
+    },
+
+    listMusic : function() {
+        var _this = this;
+        this.dispatch(constants.LIST_MUSIC);
+        musicService.listMusic(function(err, response) {
+            err = err || response.error;
+            if (err) {
+                return _this.dispatch(constants.LIST_MUSIC_FAILURE, err);
+            }
+            setTimeout(function() {
+                _this.dispatch(constants.LIST_MUSIC_SUCCESS, response.data.music);
+            }, 400);
+        });
     }
 
 };
@@ -38695,7 +38709,11 @@ module.exports = {
 module.exports = {
     UPLOAD_MUSIC : "UPLOAD_MUSIC",
     UPLOAD_MUSIC_FAILURE : "UPLOAD_MUSIC_FAILURE",
-    UPLOAD_MUSIC_SUCCESS : "UPLOAD_MUSIC_SUCCESS"
+    UPLOAD_MUSIC_SUCCESS : "UPLOAD_MUSIC_SUCCESS",
+
+    LIST_MUSIC : "LIST_MUSIC",
+    LIST_MUSIC_FAILURE : "LIST_MUSIC_FAILURE",
+    LIST_MUSIC_SUCCESS : "LIST_MUSIC_SUCCESS"
 };
 
 },{}],271:[function(require,module,exports){
@@ -38724,8 +38742,16 @@ module.exports = {
         files.forEach((file)=> {
             req.attach(file.name, file, file.name+".mp3");
         });
-        req
-            .set('Accept', 'application/json')
+        req.set('Accept', 'application/json')
+            .end(function(err, res){
+                callback(err, res.body);
+            });
+
+    },
+
+    listMusic: function(callback) {
+        var req = request.post('/application/music/list');
+        req.set('Accept', 'application/json')
             .end(function(err, res){
                 callback(err, res.body);
             });
@@ -38765,15 +38791,17 @@ module.exports = Fluxxor.createStore({
         this.loading = false;
         this.error = null;
         this.music = options.music || {
-                artists: [],
-                albums: [],
-                songs: []
+
             };
 
         this.bindActions(
             constants.UPLOAD_MUSIC, this.onUploadMusic,
             constants.UPLOAD_MUSIC_SUCCESS, this.onUploadMusicSuccess,
-            constants.UPLOAD_MUSIC_FAILURE, this.onUploadMusicFailure
+            constants.UPLOAD_MUSIC_FAILURE, this.onUploadMusicFailure,
+
+            constants.LIST_MUSIC, this.onGetMusicList,
+            constants.LIST_MUSIC_SUCCESS, this.onGetMusicListSuccess,
+            constants.LIST_MUSIC_FAILURE, this.onGetMusicListFailure
         );
     },
 
@@ -38783,15 +38811,32 @@ module.exports = Fluxxor.createStore({
     },
 
     onUploadMusicSuccess: function(payload) {
-        var _this = this;
-        _this.loading = false;
-        console.log(payload);
+        this.loading = false;
+        this.emit("change");
     },
 
     onUploadMusicFailure: function(payload) {
         this.loading = false;
+        this.error = payload.error;
         this.emit("change");
-        console.log(payload);
+
+    },
+
+    onGetMusicList: function() {
+        this.loading = true;
+        this.emit("change");
+    },
+
+    onGetMusicListSuccess: function(payload) {
+        this.loading = false;
+        this.music = payload;
+        this.emit("change");
+    },
+
+    onGetMusicListFailure: function(payload) {
+        this.loading = false;
+        this.error = payload.error;
+        this.emit("change");
     },
 
     getState: function() {
@@ -38829,16 +38874,39 @@ module.exports = Index;
 
 var React = require('react');
 var Fluxxor = require('fluxxor');
+var _ = require('lodash');
 
 var List = React.createClass({displayName: "List",
 
     mixins: [Fluxxor.FluxMixin(React)],
 
+    componentDidMount: function() {
+        this.getFlux().actions.MusicActions.listMusic();
+    },
+
     render: function() {
+        var musicStore = this.props.musicStore;
+        var bodyContent;
+        if (musicStore.loading) {
+            bodyContent= React.createElement("p", null, "Loading...");
+        } else if (Object.keys(musicStore.music).length > 0) {
+            var songs = [];
+            musicStore.music.songs.map(function(song) {
+                songs.push(
+                    React.createElement("li", {key: song._id}, song.name, " | ", song.artist.name, " | ", song.album.name)
+                );
+            });
+            bodyContent = React.createElement("ul", null, 
+                songs
+                );
+        } else {
+            bodyContent = React.createElement("p", null, "No Music");
+        }
+
         return (
             React.createElement("div", null, 
-                React.createElement("p", null, "List")
-
+                React.createElement("p", null, "Music List"), 
+                bodyContent
             )
         );
     }
@@ -38846,7 +38914,7 @@ var List = React.createClass({displayName: "List",
 
 module.exports = List;
 
-},{"fluxxor":1,"react":264}],277:[function(require,module,exports){
+},{"fluxxor":1,"lodash":22,"react":264}],277:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -38883,15 +38951,23 @@ var RouterMixin = require('react-mini-router').RouterMixin;
 var Fluxxor = require('fluxxor');
 var MusicUpload = require('./components/upload');
 var MusicList = require('./components/list');
+var StoreWatchMixin = Fluxxor.StoreWatchMixin;
 
 var Music = React.createClass({displayName: "Music",
 
-    mixins: [RouterMixin, Fluxxor.FluxMixin(React)],
+    mixins: [RouterMixin, Fluxxor.FluxMixin(React), StoreWatchMixin('MusicStore')],
 
     routes: {
         '/': 'index',
         '/list': 'list',
         '/upload': 'upload'
+    },
+
+
+    getStateFromFlux: function() {
+        return {
+            musicStore: this.getFlux().store('MusicStore').getState()
+        }
     },
 
     render: function() {
@@ -38908,7 +38984,7 @@ var Music = React.createClass({displayName: "Music",
 
     list: function() {
         return (
-            React.createElement(MusicList, null)
+            React.createElement(MusicList, {musicStore: this.state.musicStore})
         );
     },
 
