@@ -46,6 +46,10 @@ module.exports = Fluxxor.createStore({
 
     onGetMusicListSuccess: function(payload) {
         this.loading = false;
+        /**
+         * #TODO Sort through and update the records if they already exist or add if new.
+         * #TODO They will only be delta changes so overwriting all the music won't work.
+         */
         this.music = payload;
         this.emit("change");
     },
