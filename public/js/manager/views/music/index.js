@@ -25,6 +25,7 @@ var Music = React.createClass({
     },
 
     render: function() {
+        this.state.path = this.props.path;
         return this.renderCurrentRoute();
     },
 

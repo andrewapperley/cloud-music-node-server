@@ -1,5 +1,6 @@
 
 var Music = require('./manager/views/music/index');
+var MainNavBar = require('./manager/views/music/components/common/main-nav-bar');
 var React = require('react');
 var RouterMixin = require('react-mini-router').RouterMixin;
 var Fluxxor = require('fluxxor');
@@ -7,6 +8,7 @@ var FluxMixin = Fluxxor.FluxMixin(React);
 var StoreWatchMixin = Fluxxor.StoreWatchMixin;
 var ClientStore = require('./manager/stores/client-store');
 var MusicStore = require('./manager/stores/music-store');
+window.$ = window.jQuery = require('jquery');
 
 var Application = React.createClass({
 
@@ -25,7 +27,12 @@ var Application = React.createClass({
     },
 
     render: function() {
-        return this.renderCurrentRoute();
+        return (
+            <div>
+                <MainNavBar />
+                {this.renderCurrentRoute()}
+            </div>
+        );
     },
 
     index: function() {
@@ -38,7 +45,7 @@ var Application = React.createClass({
 
     music: function() {
         return (
-            <Music root="/application/music"/>
+            <Music path={this.state.path} root="/application/music"/>
         );
     },
 
