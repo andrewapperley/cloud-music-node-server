@@ -20,7 +20,7 @@ options = {
                 next(null, config);
             })
             .catch(function(err) {
-
+                console.log("Botostrap ERROR:: ", err);
             });
     }
 };

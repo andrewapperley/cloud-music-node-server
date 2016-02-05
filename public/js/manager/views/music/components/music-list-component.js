@@ -9,9 +9,19 @@ var Row = require('react-bootstrap').Row;
 
 var MusicListComponent = React.createClass({
 
+    getInitialState: function() {
+        return {
+            music: []
+        };
+    },
+
     render: function() {
 
-        var music = this.props.music;
+        if (this.props) {
+            this.state.music = (this.props.music) ? this.props.music : [];
+        }
+
+        var music = this.state.music;
         var songs = [];
         music.songs.map(function(song) {
             songs.push(
