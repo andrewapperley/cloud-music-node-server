@@ -62545,14 +62545,38 @@ var MusicListComponent = React.createClass({displayName: "MusicListComponent",
         };
     },
 
-    setSort: function(e, eventKey) {
-        this.setState({ sort: eventKey });
+    setSort: function(e, eventKey, music) {
+        var sortProperty;
+        switch (eventKey) {
+            case "Artist":
+                sortProperty = "artist.name";
+                break;
+            case "Album":
+                sortProperty = "album.name";
+                break;
+            case "Genre":
+                sortProperty = "genre";
+                break;
+            case "Song":
+            default:
+                sortProperty = "name";
+                break;
+        }
+        var _m = music ? music : this.state.music;
+        _m.songs = _.sortBy(_m.songs, sortProperty);
+        if (!music) {
+            this.setState({ sort: eventKey, music: _m});
+        } else {
+            return _m;
+        }
     },
 
     render: function() {
 
         if (this.props) {
-            this.state.music = this.props.music;
+            if (this.props.music.length !== this.state.music.length) {
+                this.state.music = this.setSort(null, null, this.props.music);
+            }
         }
 
         var sort = this.state.sort;
@@ -62576,7 +62600,8 @@ var MusicListComponent = React.createClass({displayName: "MusicListComponent",
                     React.createElement(DropdownButton, {bsStyle: "default", title: this.state.sort, id: `sort-dropdown`}, 
                         React.createElement(MenuItem, {onSelect: this.setSort, active: sort === "Song", eventKey: "Song"}, "Song"), 
                         React.createElement(MenuItem, {onSelect: this.setSort, active: sort === "Artist", eventKey: "Artist"}, "Artist"), 
-                        React.createElement(MenuItem, {onSelect: this.setSort, active: sort === "Album", eventKey: "Album"}, "Album")
+                        React.createElement(MenuItem, {onSelect: this.setSort, active: sort === "Album", eventKey: "Album"}, "Album"), 
+                        React.createElement(MenuItem, {onSelect: this.setSort, active: sort === "Genre", eventKey: "Genre"}, "Genre")
                     ), 
                     React.createElement("table", {className: "table table-hover table-striped"}, 
                         React.createElement("thead", null, 

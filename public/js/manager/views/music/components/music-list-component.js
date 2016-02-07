@@ -18,14 +18,38 @@ var MusicListComponent = React.createClass({
         };
     },
 
-    setSort: function(e, eventKey) {
-        this.setState({ sort: eventKey });
+    setSort: function(e, eventKey, music) {
+        var sortProperty;
+        switch (eventKey) {
+            case "Artist":
+                sortProperty = "artist.name";
+                break;
+            case "Album":
+                sortProperty = "album.name";
+                break;
+            case "Genre":
+                sortProperty = "genre";
+                break;
+            case "Song":
+            default:
+                sortProperty = "name";
+                break;
+        }
+        var _m = music ? music : this.state.music;
+        _m.songs = _.sortBy(_m.songs, sortProperty);
+        if (!music) {
+            this.setState({ sort: eventKey, music: _m});
+        } else {
+            return _m;
+        }
     },
 
     render: function() {
 
         if (this.props) {
-            this.state.music = this.props.music;
+            if (this.props.music.length !== this.state.music.length) {
+                this.state.music = this.setSort(null, null, this.props.music);
+            }
         }
 
         var sort = this.state.sort;
@@ -50,6 +74,7 @@ var MusicListComponent = React.createClass({
                         <MenuItem onSelect={this.setSort} active={sort === "Song"} eventKey="Song">Song</MenuItem>
                         <MenuItem onSelect={this.setSort} active={sort === "Artist"} eventKey="Artist">Artist</MenuItem>
                         <MenuItem onSelect={this.setSort} active={sort === "Album"} eventKey="Album">Album</MenuItem>
+                        <MenuItem onSelect={this.setSort} active={sort === "Genre"} eventKey="Genre">Genre</MenuItem>
                     </DropdownButton>
                     <table className="table table-hover table-striped">
                         <thead>
