@@ -52644,21 +52644,29 @@ var _ = require('lodash');
 var Grid = require('react-bootstrap').Grid;
 var Col = require('react-bootstrap').Col;
 var Row = require('react-bootstrap').Row;
+var DropdownButton = require('react-bootstrap').DropdownButton;
+var MenuItem = require('react-bootstrap').MenuItem;
 
 var MusicListComponent = React.createClass({displayName: "MusicListComponent",
 
     getInitialState: function() {
         return {
+            sort: "Song",
             music: []
         };
+    },
+
+    setSort: function(e, eventKey) {
+        this.setState({ sort: eventKey });
     },
 
     render: function() {
 
         if (this.props) {
-            this.state.music = (this.props.music) ? this.props.music : [];
+            this.state.music = this.props.music;
         }
 
+        var sort = this.state.sort;
         var music = this.state.music;
         var songs = [];
         music.songs.map(function(song) {
@@ -52676,6 +52684,11 @@ var MusicListComponent = React.createClass({displayName: "MusicListComponent",
         React.createElement(Grid, null, 
             React.createElement(Row, {classname: "centered-block"}, 
                 React.createElement(Col, {md: 11}, 
+                    React.createElement(DropdownButton, {bsStyle: "default", title: this.state.sort, id: `sort-dropdown`}, 
+                        React.createElement(MenuItem, {onSelect: this.setSort, active: sort === "Song", eventKey: "Song"}, "Song"), 
+                        React.createElement(MenuItem, {onSelect: this.setSort, active: sort === "Artist", eventKey: "Artist"}, "Artist"), 
+                        React.createElement(MenuItem, {onSelect: this.setSort, active: sort === "Album", eventKey: "Album"}, "Album")
+                    ), 
                     React.createElement("table", {className: "table table-hover table-striped"}, 
                         React.createElement("thead", null, 
                         React.createElement("tr", null, 

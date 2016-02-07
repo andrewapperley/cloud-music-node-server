@@ -9,5 +9,6 @@ module.exports = function (grunt) {
     });
 
     // Register group tasks
-    grunt.registerTask('build', ['less', 'browserify', 'copyto']);
+    grunt.registerTask('dev', ['less', 'browserify:dev']);
+    grunt.registerTask('build', ['less', 'browserify:build', 'copyto']);
 };

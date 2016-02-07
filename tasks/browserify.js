@@ -19,6 +19,16 @@ module.exports = function browserify(grunt) {
 			options: {
                 "transform": ["reactify"]
             }
+		},
+		dev: {
+			files: {
+				'public/dist/js/application.js': ['public/js/application.js'],
+				'public/dist/js/editor.js': ['public/js/manager/**/*.js'],
+				'public/dist/js/public.js': ['public/js/public.js']
+			},
+			options: {
+				"transform": ["reactify"]
+			}
 		}
 	};
 };
