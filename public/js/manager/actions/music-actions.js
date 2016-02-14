@@ -23,9 +23,7 @@ module.exports = {
             if (err) {
                 return _this.dispatch(constants.LIST_MUSIC_FAILURE, err);
             }
-            setTimeout(function() {
-                _this.dispatch(constants.LIST_MUSIC_SUCCESS, response.data.music);
-            }, 400);
+            _this.dispatch(constants.LIST_MUSIC_SUCCESS, response.data.music);
         });
     }
 

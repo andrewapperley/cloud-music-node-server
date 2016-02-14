@@ -62292,9 +62292,7 @@ module.exports = {
             if (err) {
                 return _this.dispatch(constants.LIST_MUSIC_FAILURE, err);
             }
-            setTimeout(function() {
-                _this.dispatch(constants.LIST_MUSIC_SUCCESS, response.data.music);
-            }, 400);
+            _this.dispatch(constants.LIST_MUSIC_SUCCESS, response.data.music);
         });
     }
 
@@ -62492,8 +62490,10 @@ module.exports = MainNavBar;
 
 var React = require('react');
 var Fluxxor = require('fluxxor');
-var _ = require('lodash');
 var MusicListComponent = require('./music-list-component');
+var Grid = require('react-bootstrap').Grid;
+var Col = require('react-bootstrap').Col;
+var Row = require('react-bootstrap').Row;
 
 var List = React.createClass({displayName: "List",
 
@@ -62515,8 +62515,12 @@ var List = React.createClass({displayName: "List",
         }
 
         return (
-            React.createElement("div", null, 
-                bodyContent
+            React.createElement(Grid, null, 
+                React.createElement(Row, {classname: "centered-block"}, 
+                    React.createElement(Col, null, 
+                        bodyContent
+                    )
+                )
             )
         );
     }
@@ -62524,15 +62528,12 @@ var List = React.createClass({displayName: "List",
 
 module.exports = List;
 
-},{"./music-list-component":515,"fluxxor":1,"lodash":23,"react":501}],515:[function(require,module,exports){
+},{"./music-list-component":515,"fluxxor":1,"react":501,"react-bootstrap":171}],515:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
 var _ = require('lodash');
 
-var Grid = require('react-bootstrap').Grid;
-var Col = require('react-bootstrap').Col;
-var Row = require('react-bootstrap').Row;
 var DropdownButton = require('react-bootstrap').DropdownButton;
 var MenuItem = require('react-bootstrap').MenuItem;
 
@@ -62594,32 +62595,28 @@ var MusicListComponent = React.createClass({displayName: "MusicListComponent",
         });
 
         return (
-        React.createElement(Grid, null, 
-            React.createElement(Row, {classname: "centered-block"}, 
-                React.createElement(Col, {md: 11}, 
-                    React.createElement(DropdownButton, {bsStyle: "default", title: this.state.sort, id: `sort-dropdown`}, 
-                        React.createElement(MenuItem, {onSelect: this.setSort, active: sort === "Song", eventKey: "Song"}, "Song"), 
-                        React.createElement(MenuItem, {onSelect: this.setSort, active: sort === "Artist", eventKey: "Artist"}, "Artist"), 
-                        React.createElement(MenuItem, {onSelect: this.setSort, active: sort === "Album", eventKey: "Album"}, "Album"), 
-                        React.createElement(MenuItem, {onSelect: this.setSort, active: sort === "Genre", eventKey: "Genre"}, "Genre")
+            React.createElement("div", null, 
+                React.createElement(DropdownButton, {bsStyle: "default", title: this.state.sort, id: `sort-dropdown`}, 
+                    React.createElement(MenuItem, {onSelect: this.setSort, active: sort === "Song", eventKey: "Song"}, "Song"), 
+                    React.createElement(MenuItem, {onSelect: this.setSort, active: sort === "Artist", eventKey: "Artist"}, "Artist"), 
+                    React.createElement(MenuItem, {onSelect: this.setSort, active: sort === "Album", eventKey: "Album"}, "Album"), 
+                    React.createElement(MenuItem, {onSelect: this.setSort, active: sort === "Genre", eventKey: "Genre"}, "Genre")
+                ), 
+                React.createElement("table", {className: "table table-hover table-striped"}, 
+                    React.createElement("thead", null, 
+                    React.createElement("tr", null, 
+                        React.createElement("th", null, "Song"), 
+                        React.createElement("th", null, "Artist"), 
+                        React.createElement("th", null, "Album"), 
+                        React.createElement("th", null, "Genres")
+                    )
                     ), 
-                    React.createElement("table", {className: "table table-hover table-striped"}, 
-                        React.createElement("thead", null, 
-                        React.createElement("tr", null, 
-                            React.createElement("th", null, "Song"), 
-                            React.createElement("th", null, "Artist"), 
-                            React.createElement("th", null, "Album"), 
-                            React.createElement("th", null, "Genres")
-                        )
-                        ), 
-                        React.createElement("tbody", null, 
-                        songs
-                        )
-                    ), 
-                    React.createElement("div", {className: "clearfix"})
-                )
+                    React.createElement("tbody", null, 
+                    songs
+                    )
+                ), 
+                React.createElement("div", {className: "clearfix"})
             )
-        )
         );
     }
 
@@ -62632,31 +62629,77 @@ module.exports = MusicListComponent;
 
 var React = require('react');
 var Fluxxor = require('fluxxor');
+var _ = require('lodash');
 var Dropzone = require('react-dropzone');
+var Grid = require('react-bootstrap').Grid;
+var Col = require('react-bootstrap').Col;
+var Row = require('react-bootstrap').Row;
+var Alert = require('react-bootstrap').Alert;
 
 var Upload = React.createClass({displayName: "Upload",
 
     mixins: [Fluxxor.FluxMixin(React)],
 
-    onDrop: function(files) {
+    getInitialState: function() {
+        return {
+            files: []
+        };
+    },
+
+    onDropAccepted: function(files, e) {
+        this.state.files.push(files);
+        this.setState({
+            files: _.flatten(this.state.files),
+            showError: false
+        });
         this.getFlux().actions.MusicActions.postMusic(files);
+    },
+
+    onDropRejected: function(files, e) {
+        this.setState({
+            showError: true
+        });
+    },
+
+    handleErrorDismiss: function() {
+        this.setState({
+            showError: false
+        });
     },
 
     render: function() {
         return (
-            React.createElement("div", null, 
-                React.createElement("p", null, "Upload"), 
-                React.createElement(Dropzone, {onDrop: this.onDrop, accept: "audio/mpeg3"}, 
-                    React.createElement("div", null, "Try dropping some files here, or click to select files to upload.")
+        React.createElement(Grid, null, 
+            React.createElement(Row, {classname: "centered-block"}, 
+                React.createElement(Col, null, 
+                    React.createElement("p", null, "Upload"), 
+                    React.createElement(Dropzone, {disableClick: true, onDropAccepted: this.onDropAccepted, onDropRejected: this.onDropRejected, accept: ".mp3,.m4a"}, 
+                        React.createElement("div", null, "Try dropping some files here, or click to select files to upload.")
+                    ), 
+                    this.state.showError ?
+                        React.createElement(Alert, {bsStyle: "danger", onDismiss: this.handleErrorDismiss, dismissAfter: 2000}, 
+                            React.createElement("h4", null, "Oh snap! An error occurred!"), 
+                            React.createElement("p", null, "Only MP3 files are accepted.")
+                        )
+                    : null, 
+                    this.state.files.length > 0 ? React.createElement("div", null, 
+                        React.createElement("h2", null, "Uploading ", this.state.files.length, " files..."), 
+                        React.createElement("ul", null, 
+                            this.state.files.map(function(file) {
+                                return React.createElement("li", {key: file.name}, file.name)
+                            })
+                        )
+                    ) : null
                 )
             )
+        )
         );
     }
 });
 
 module.exports = Upload;
 
-},{"fluxxor":1,"react":501,"react-dropzone":337}],517:[function(require,module,exports){
+},{"fluxxor":1,"lodash":23,"react":501,"react-bootstrap":171,"react-dropzone":337}],517:[function(require,module,exports){
 'use strict';
 
 var React = require('react');

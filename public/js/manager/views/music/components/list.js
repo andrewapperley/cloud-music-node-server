@@ -2,8 +2,10 @@
 
 var React = require('react');
 var Fluxxor = require('fluxxor');
-var _ = require('lodash');
 var MusicListComponent = require('./music-list-component');
+var Grid = require('react-bootstrap').Grid;
+var Col = require('react-bootstrap').Col;
+var Row = require('react-bootstrap').Row;
 
 var List = React.createClass({
 
@@ -25,9 +27,13 @@ var List = React.createClass({
         }
 
         return (
-            <div>
-                {bodyContent}
-            </div>
+            <Grid>
+                <Row classname="centered-block">
+                    <Col>
+                        {bodyContent}
+                    </Col>
+                </Row>
+            </Grid>
         );
     }
 });
