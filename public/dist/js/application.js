@@ -62673,7 +62673,7 @@ var Upload = React.createClass({displayName: "Upload",
             React.createElement(Row, {classname: "centered-block"}, 
                 React.createElement(Col, null, 
                     React.createElement("p", null, "Upload"), 
-                    React.createElement(Dropzone, {disableClick: true, onDropAccepted: this.onDropAccepted, onDropRejected: this.onDropRejected, accept: ".mp3,.m4a"}, 
+                    React.createElement(Dropzone, {className: "dropzone-upload", activeClassName: "dropzone-upload-active", rejectClassName: "dropzone-upload-reject", disableClick: true, onDropAccepted: this.onDropAccepted, onDropRejected: this.onDropRejected, accept: "audio/mp3,audio/x-m4a,.mp3,.m4a"}, 
                         React.createElement("div", null, "Try dropping some files here, or click to select files to upload.")
                     ), 
                     this.state.showError ?

@@ -46,7 +46,7 @@ var Upload = React.createClass({
             <Row classname="centered-block">
                 <Col>
                     <p>Upload</p>
-                    <Dropzone disableClick={true} onDropAccepted={this.onDropAccepted} onDropRejected={this.onDropRejected} accept=".mp3,.m4a">
+                    <Dropzone className="dropzone-upload" activeClassName="dropzone-upload-active" rejectClassName="dropzone-upload-reject" disableClick={true} onDropAccepted={this.onDropAccepted} onDropRejected={this.onDropRejected} accept="audio/mp3,audio/x-m4a,.mp3,.m4a">
                         <div>Try dropping some files here, or click to select files to upload.</div>
                     </Dropzone>
                     {this.state.showError ?

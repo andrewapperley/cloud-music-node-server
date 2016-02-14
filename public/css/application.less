@@ -1,1 +1,18 @@
 @import "../../node_modules/bootstrap/less/bootstrap.less";
+
+.dropzone-upload {
+  margin: 0 auto;
+  width: 90%;
+  height: 500px;
+  display: block;
+  border: dashed 2px black;
+  border-radius: 5px;
+}
+
+.dropzone-upload-active {
+  background-color: lighten(@brand-success, 40%);
+}
+
+.dropzone-upload-reject {
+  background-color: lighten(@brand-danger, 30%);
+}
