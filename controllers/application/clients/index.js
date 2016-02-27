@@ -22,7 +22,7 @@ module.exports = function(router) {
     });
 
   });
-
+    
   /**
   * Update Client based on an ID with new data
   */

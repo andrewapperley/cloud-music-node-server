@@ -2,6 +2,7 @@
 
 var React = require('react');
 var _ = require('lodash');
+var Fluxxor = require('fluxxor');
 
 var Navbar = require('react-bootstrap').Navbar;
 var Nav = require('react-bootstrap').Nav;
@@ -14,6 +15,8 @@ var NavBrand = require('react-bootstrap').NavBrand;
 
 var MainNavBar = React.createClass({
 
+    mixins: [Fluxxor.FluxMixin(React)],
+
 
     render: function() {
         return (
@@ -25,7 +28,7 @@ var MainNavBar = React.createClass({
                     <NavDropdown eventKey={3} title="Account" id="collapsible-navbar-dropdown">
                         <MenuItem href="/application/clients/" eventKey="1">Andrew Apperley</MenuItem>
                         <MenuItem divider />
-                        <MenuItem href="/application/clients/logout" eventKey="4">Logout</MenuItem>
+                        <MenuItem href="/logout" eventKey="4">Logout</MenuItem>
                     </NavDropdown>
                 </Nav>
             </Navbar>

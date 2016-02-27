@@ -62257,12 +62257,7 @@ var clientService = require('../services/client-service');
 
 module.exports = {
 
-     createList: function(name) {
-         var self = this;
-         //clientService.SOMETHING({ name: name }, function(err, data) {
-         //   self.dispatch(constants.SOMETHING, data);
-         //});
-     }
+
 
 };
 
@@ -62312,23 +62307,28 @@ module.exports = {
 
     LIST_MUSIC : "LIST_MUSIC",
     LIST_MUSIC_FAILURE : "LIST_MUSIC_FAILURE",
-    LIST_MUSIC_SUCCESS : "LIST_MUSIC_SUCCESS"
+    LIST_MUSIC_SUCCESS : "LIST_MUSIC_SUCCESS",
+
+    LOGOUT : "LOGOUT",
+    LOGOUT_FAILURE : "LOGOUT_FAILURE",
+    LOGOUT_SUCCESS : "LOGOUT_SUCCESS"
+
 };
 
 },{}],509:[function(require,module,exports){
 var request = require('superagent');
 
 module.exports = {
-  getClient: function (id, callback) {
+    getClient: function (id, callback) {
 
-    request
-    .post('/application/clients/')
-    .set('Accept', 'application/json')
-    .end(function(error, res) {
-        console.log(res);
-    });
+        request
+            .post('/application/clients/')
+            .set('Accept', 'application/json')
+            .end(function(error, res) {
+                console.log(res);
+            });
 
-  }
+    }
 };
 
 },{"superagent":502}],510:[function(require,module,exports){
@@ -62468,6 +62468,7 @@ module.exports = Fluxxor.createStore({
 
 var React = require('react');
 var _ = require('lodash');
+var Fluxxor = require('fluxxor');
 
 var Navbar = require('react-bootstrap').Navbar;
 var Nav = require('react-bootstrap').Nav;
@@ -62480,6 +62481,8 @@ var NavBrand = require('react-bootstrap').NavBrand;
 
 var MainNavBar = React.createClass({displayName: "MainNavBar",
 
+    mixins: [Fluxxor.FluxMixin(React)],
+
 
     render: function() {
         return (
@@ -62491,7 +62494,7 @@ var MainNavBar = React.createClass({displayName: "MainNavBar",
                     React.createElement(NavDropdown, {eventKey: 3, title: "Account", id: "collapsible-navbar-dropdown"}, 
                         React.createElement(MenuItem, {href: "/application/clients/", eventKey: "1"}, "Andrew Apperley"), 
                         React.createElement(MenuItem, {divider: true}), 
-                        React.createElement(MenuItem, {href: "/application/clients/logout", eventKey: "4"}, "Logout")
+                        React.createElement(MenuItem, {href: "/logout", eventKey: "4"}, "Logout")
                     )
                 )
             )
@@ -62502,7 +62505,7 @@ var MainNavBar = React.createClass({displayName: "MainNavBar",
 
 module.exports = MainNavBar;
 
-},{"lodash":23,"react":501,"react-bootstrap":171}],514:[function(require,module,exports){
+},{"fluxxor":1,"lodash":23,"react":501,"react-bootstrap":171}],514:[function(require,module,exports){
 'use strict';
 
 var React = require('react');

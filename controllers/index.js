@@ -13,4 +13,14 @@ module.exports = function (router) {
 
     });
 
+    /**
+     * Logout current user
+     */
+
+    router.get("/logout", function(req, res) {
+        req.logout();
+        res.redirect('/login');
+    });
+
+
 };
