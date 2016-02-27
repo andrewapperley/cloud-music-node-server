@@ -28,7 +28,7 @@ module.exports = function browserify(grunt) {
 			},
 			options: {
 				"transform": ["reactify"]
-			}
+            }
 		}
 	};
 };

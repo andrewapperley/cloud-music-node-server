@@ -45,7 +45,7 @@ var Music = React.createClass({
 
     upload: function() {
         return (
-            <MusicUpload />
+            <MusicUpload musicStore={this.state.musicStore}/>
         );
     },
 

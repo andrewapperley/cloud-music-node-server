@@ -52362,10 +52362,14 @@ var musicService = require('../services/music-service');
 
 module.exports = {
 
-    postMusic : function(files) {
+    postMusic : function(files, id) {
         var _this = this;
         this.dispatch(constants.UPLOAD_MUSIC);
-        musicService.uploadMusic(files, function(err, response) {
+        musicService.uploadMusic(files, function(progress) {
+            var _progress = {};
+            _progress[id] = progress;
+            _this.dispatch(constants.UPLOAD_MUSIC_PROGRESS, _progress);
+        }, function(err, response) {
             err = err || response.error;
             if (err) {
                 return _this.dispatch(constants.UPLOAD_MUSIC_FAILURE, err);
@@ -52392,6 +52396,7 @@ module.exports = {
 
 module.exports = {
     UPLOAD_MUSIC : "UPLOAD_MUSIC",
+    UPLOAD_MUSIC_PROGRESS: "UPLOAD_MUSIC_PROGRESS",
     UPLOAD_MUSIC_FAILURE : "UPLOAD_MUSIC_FAILURE",
     UPLOAD_MUSIC_SUCCESS : "UPLOAD_MUSIC_SUCCESS",
 
@@ -52421,14 +52426,17 @@ var request = require('superagent');
 
 module.exports = {
 
-    uploadMusic: function(files, callback) {
+    uploadMusic: function(files, progressCallback, finishedCallback) {
         var req = request.post('/application/music/upload');
         files.forEach((file)=> {
             req.attach(file.name, file, file.name+".mp3");
         });
         req.set('Accept', 'application/json')
+            .on('progress', function(e) {
+                progressCallback(e.percent);
+            })
             .end(function(err, res){
-                callback(err, res.body);
+                finishedCallback(err, res.body);
             });
 
     },
@@ -52474,12 +52482,14 @@ module.exports = Fluxxor.createStore({
 
         this.loading = false;
         this.error = null;
+        this.progress = {};
         this.music = options.music || {
 
             };
 
         this.bindActions(
             constants.UPLOAD_MUSIC, this.onUploadMusic,
+            constants.UPLOAD_MUSIC_PROGRESS, this.onUploadMusicProgress,
             constants.UPLOAD_MUSIC_SUCCESS, this.onUploadMusicSuccess,
             constants.UPLOAD_MUSIC_FAILURE, this.onUploadMusicFailure,
 
@@ -52491,6 +52501,12 @@ module.exports = Fluxxor.createStore({
 
     onUploadMusic: function() {
         this.loading = true;
+        this.emit("change");
+    },
+
+    onUploadMusicProgress: function(payload) {
+        var id = _.keys(payload)[0];
+        this.progress[id] = payload[id];
         this.emit("change");
     },
 
@@ -52531,7 +52547,8 @@ module.exports = Fluxxor.createStore({
         return {
             loading: this.loading,
             music: this.music,
-            error: this.error
+            error: this.error,
+            progress: this.progress
         };
     }
 });
@@ -52758,12 +52775,13 @@ var Upload = React.createClass({displayName: "Upload",
     },
 
     onDropAccepted: function(files, e) {
-        this.state.files.push(files);
+        var now = new Date().getTime();
+        this.state.files.push(_.map(files, function(file){file.id = now; return file;}));
         this.setState({
             files: _.flatten(this.state.files),
             showError: false
         });
-        this.getFlux().actions.MusicActions.postMusic(files);
+        this.getFlux().actions.MusicActions.postMusic(files, now);
     },
 
     onDropRejected: function(files, e) {
@@ -52779,13 +52797,16 @@ var Upload = React.createClass({displayName: "Upload",
     },
 
     render: function() {
+        var musicStore = this.props.musicStore;
         return (
         React.createElement(Grid, null, 
             React.createElement(Row, {classname: "centered-block"}, 
                 React.createElement(Col, null, 
                     React.createElement("p", null, "Upload"), 
                     React.createElement(Dropzone, {className: "dropzone-upload", activeClassName: "dropzone-upload-active", rejectClassName: "dropzone-upload-reject", disableClick: true, onDropAccepted: this.onDropAccepted, onDropRejected: this.onDropRejected, accept: "audio/mp3,audio/x-m4a,.mp3,.m4a"}, 
-                        React.createElement("div", null, "Try dropping some files here, or click to select files to upload.")
+                        React.createElement("div", null, 
+                            React.createElement("p", null, "Drop .mp3 files here.")
+                        )
                     ), 
                     this.state.showError ?
                         React.createElement(Alert, {bsStyle: "danger", onDismiss: this.handleErrorDismiss, dismissAfter: 2000}, 
@@ -52794,10 +52815,9 @@ var Upload = React.createClass({displayName: "Upload",
                         )
                     : null, 
                     this.state.files.length > 0 ? React.createElement("div", null, 
-                        React.createElement("h2", null, "Uploading ", this.state.files.length, " files..."), 
                         React.createElement("ul", null, 
                             this.state.files.map(function(file) {
-                                return React.createElement("li", {key: file.name}, file.name)
+                                return React.createElement("li", {key: file.name}, file.name, " Progress: ", parseInt(musicStore.progress[file.id]), "%")
                             })
                         )
                     ) : null
@@ -52858,7 +52878,7 @@ var Music = React.createClass({displayName: "Music",
 
     upload: function() {
         return (
-            React.createElement(MusicUpload, null)
+            React.createElement(MusicUpload, {musicStore: this.state.musicStore})
         );
     },
 

@@ -2,14 +2,17 @@ var request = require('superagent');
 
 module.exports = {
 
-    uploadMusic: function(files, callback) {
+    uploadMusic: function(files, progressCallback, finishedCallback) {
         var req = request.post('/application/music/upload');
         files.forEach((file)=> {
             req.attach(file.name, file, file.name+".mp3");
         });
         req.set('Accept', 'application/json')
+            .on('progress', function(e) {
+                progressCallback(e.percent);
+            })
             .end(function(err, res){
-                callback(err, res.body);
+                finishedCallback(err, res.body);
             });
 
     },

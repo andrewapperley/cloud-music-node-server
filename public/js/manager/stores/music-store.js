@@ -7,12 +7,14 @@ module.exports = Fluxxor.createStore({
 
         this.loading = false;
         this.error = null;
+        this.progress = {};
         this.music = options.music || {
 
             };
 
         this.bindActions(
             constants.UPLOAD_MUSIC, this.onUploadMusic,
+            constants.UPLOAD_MUSIC_PROGRESS, this.onUploadMusicProgress,
             constants.UPLOAD_MUSIC_SUCCESS, this.onUploadMusicSuccess,
             constants.UPLOAD_MUSIC_FAILURE, this.onUploadMusicFailure,
 
@@ -24,6 +26,12 @@ module.exports = Fluxxor.createStore({
 
     onUploadMusic: function() {
         this.loading = true;
+        this.emit("change");
+    },
+
+    onUploadMusicProgress: function(payload) {
+        var id = _.keys(payload)[0];
+        this.progress[id] = payload[id];
         this.emit("change");
     },
 
@@ -64,7 +72,8 @@ module.exports = Fluxxor.createStore({
         return {
             loading: this.loading,
             music: this.music,
-            error: this.error
+            error: this.error,
+            progress: this.progress
         };
     }
 });

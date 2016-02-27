@@ -3,10 +3,14 @@ var musicService = require('../services/music-service');
 
 module.exports = {
 
-    postMusic : function(files) {
+    postMusic : function(files, id) {
         var _this = this;
         this.dispatch(constants.UPLOAD_MUSIC);
-        musicService.uploadMusic(files, function(err, response) {
+        musicService.uploadMusic(files, function(progress) {
+            var _progress = {};
+            _progress[id] = progress;
+            _this.dispatch(constants.UPLOAD_MUSIC_PROGRESS, _progress);
+        }, function(err, response) {
             err = err || response.error;
             if (err) {
                 return _this.dispatch(constants.UPLOAD_MUSIC_FAILURE, err);
