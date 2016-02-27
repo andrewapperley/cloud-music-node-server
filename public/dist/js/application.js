@@ -62706,7 +62706,7 @@ var Upload = React.createClass({displayName: "Upload",
                     this.state.files.length > 0 ? React.createElement("div", null, 
                         React.createElement("ul", null, 
                             this.state.files.map(function(file) {
-                                return React.createElement("li", {key: file.name}, file.name, " Progress: ", parseInt(musicStore.progress[file.id]), "%")
+                                return React.createElement("li", {key: file.name+'_'+file.id}, file.name, " Progress: ", parseInt(musicStore.progress[file.id]), "%")
                             })
                         )
                     ) : null

@@ -62,7 +62,7 @@ var Upload = React.createClass({
                     {this.state.files.length > 0 ? <div>
                         <ul>
                             {this.state.files.map(function(file) {
-                                return <li key={file.name}>{file.name} Progress: {parseInt(musicStore.progress[file.id])}%</li>
+                                return <li key={file.name+'_'+file.id}>{file.name} Progress: {parseInt(musicStore.progress[file.id])}%</li>
                             })}
                         </ul>
                     </div> : null}
