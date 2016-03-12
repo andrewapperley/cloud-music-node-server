@@ -1,12 +1,20 @@
 @import "../../node_modules/bootstrap/less/bootstrap.less";
 
-.dropzone-upload {
+.dropzone-upload-container {
   margin: 0 auto;
   width: 90%;
-  height: 500px;
+  min-height: 500px;
+}
+
+.dropzone-upload {
+  width: 100%;
+  height: 100px;
   display: block;
   border: dashed 2px black;
+  margin-bottom: 20px;
   border-radius: 5px;
+  text-align: center;
+  font-size: 50pt;
 }
 
 .dropzone-upload-active {
@@ -15,4 +23,24 @@
 
 .dropzone-upload-reject {
   background-color: lighten(@brand-danger, 30%);
+}
+
+.upload-progress-container {
+  ul {
+    padding-left: 0;
+    li {
+      padding: 0 20px;
+      list-style: none;
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-start;
+      align-items: flex-start;
+      div.progress {
+        flex-grow: 2;
+      }
+      p {
+        padding-right: 20px;
+      }
+    }
+  }
 }

@@ -8,6 +8,7 @@ var Grid = require('react-bootstrap').Grid;
 var Col = require('react-bootstrap').Col;
 var Row = require('react-bootstrap').Row;
 var Alert = require('react-bootstrap').Alert;
+var ProgressBar = require('react-bootstrap').ProgressBar;
 
 var Upload = React.createClass({
 
@@ -47,25 +48,29 @@ var Upload = React.createClass({
         <Grid>
             <Row classname="centered-block">
                 <Col>
-                    <p>Upload</p>
                     <Dropzone className="dropzone-upload" activeClassName="dropzone-upload-active" rejectClassName="dropzone-upload-reject" disableClick={true} onDropAccepted={this.onDropAccepted} onDropRejected={this.onDropRejected} accept="audio/mp3,audio/x-m4a,.mp3,.m4a">
                         <div>
                             <p>Drop .mp3 files here.</p>
                         </div>
                     </Dropzone>
-                    {this.state.showError ?
-                        <Alert bsStyle="danger" onDismiss={this.handleErrorDismiss} dismissAfter={2000}>
-                            <h4>Oh snap! An error occurred!</h4>
-                            <p>Only MP3 files are accepted.</p>
-                        </Alert>
-                    : null}
-                    {this.state.files.length > 0 ? <div>
-                        <ul>
-                            {this.state.files.map(function(file) {
-                                return <li key={file.name+'_'+file.id}>{file.name} Progress: {parseInt(musicStore.progress[file.id])}%</li>
-                            })}
-                        </ul>
-                    </div> : null}
+                    <div class="dropzone-upload-container">
+                        {this.state.showError ?
+                            <Alert bsStyle="danger" onDismiss={this.handleErrorDismiss} dismissAfter={2000}>
+                                <h4>Oh snap! An error occurred!</h4>
+                                <p>Only MP3 files are accepted.</p>
+                            </Alert>
+                            : null}
+                        {this.state.files.length > 0 ? <div className="upload-progress-container">
+                            <ul>
+                                {this.state.files.map(function(file) {
+                                    return <li key={file.name+'_'+file.id}>
+                                        <p>{file.name} </p>
+                                        <ProgressBar now={parseInt(musicStore.progress[file.id])} label="%(percent)s%" />
+                                    </li>
+                                })}
+                            </ul>
+                        </div> : null}
+                    </div>
                 </Col>
             </Row>
         </Grid>

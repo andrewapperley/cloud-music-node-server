@@ -52766,6 +52766,7 @@ var Grid = require('react-bootstrap').Grid;
 var Col = require('react-bootstrap').Col;
 var Row = require('react-bootstrap').Row;
 var Alert = require('react-bootstrap').Alert;
+var ProgressBar = require('react-bootstrap').ProgressBar;
 
 var Upload = React.createClass({displayName: "Upload",
 
@@ -52805,25 +52806,29 @@ var Upload = React.createClass({displayName: "Upload",
         React.createElement(Grid, null, 
             React.createElement(Row, {classname: "centered-block"}, 
                 React.createElement(Col, null, 
-                    React.createElement("p", null, "Upload"), 
                     React.createElement(Dropzone, {className: "dropzone-upload", activeClassName: "dropzone-upload-active", rejectClassName: "dropzone-upload-reject", disableClick: true, onDropAccepted: this.onDropAccepted, onDropRejected: this.onDropRejected, accept: "audio/mp3,audio/x-m4a,.mp3,.m4a"}, 
                         React.createElement("div", null, 
                             React.createElement("p", null, "Drop .mp3 files here.")
                         )
                     ), 
-                    this.state.showError ?
-                        React.createElement(Alert, {bsStyle: "danger", onDismiss: this.handleErrorDismiss, dismissAfter: 2000}, 
-                            React.createElement("h4", null, "Oh snap! An error occurred!"), 
-                            React.createElement("p", null, "Only MP3 files are accepted.")
-                        )
-                    : null, 
-                    this.state.files.length > 0 ? React.createElement("div", null, 
-                        React.createElement("ul", null, 
-                            this.state.files.map(function(file) {
-                                return React.createElement("li", {key: file.name+'_'+file.id}, file.name, " Progress: ", parseInt(musicStore.progress[file.id]), "%")
-                            })
-                        )
-                    ) : null
+                    React.createElement("div", {class: "dropzone-upload-container"}, 
+                        this.state.showError ?
+                            React.createElement(Alert, {bsStyle: "danger", onDismiss: this.handleErrorDismiss, dismissAfter: 2000}, 
+                                React.createElement("h4", null, "Oh snap! An error occurred!"), 
+                                React.createElement("p", null, "Only MP3 files are accepted.")
+                            )
+                            : null, 
+                        this.state.files.length > 0 ? React.createElement("div", {className: "upload-progress-container"}, 
+                            React.createElement("ul", null, 
+                                this.state.files.map(function(file) {
+                                    return React.createElement("li", {key: file.name+'_'+file.id}, 
+                                        React.createElement("p", null, file.name, " "), 
+                                        React.createElement(ProgressBar, {now: parseInt(musicStore.progress[file.id]), label: "%(percent)s%"})
+                                    )
+                                })
+                            )
+                        ) : null
+                    )
                 )
             )
         )
