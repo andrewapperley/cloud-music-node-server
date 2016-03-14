@@ -2,12 +2,12 @@ var request = require('superagent');
 
 module.exports = {
     getClient: function (id, callback) {
-
+        id = id || "current";
         request
-            .post('/application/clients/')
+            .post('/application/clients/'+id+"/get")
             .set('Accept', 'application/json')
             .end(function(error, res) {
-                console.log(res);
+                callback(error, res.body);
             });
 
     }

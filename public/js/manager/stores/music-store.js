@@ -8,9 +8,7 @@ module.exports = Fluxxor.createStore({
         this.loading = false;
         this.error = null;
         this.progress = {};
-        this.music = options.music || {
-
-            };
+        this.music = options.music || {};
 
         this.bindActions(
             constants.UPLOAD_MUSIC, this.onUploadMusic,

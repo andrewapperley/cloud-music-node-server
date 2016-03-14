@@ -1,5 +1,6 @@
 
 var Music = require('./manager/views/music/index');
+var Clients = require('./manager/views/clients/index');
 var MainNavBar = require('./manager/views/music/components/common/main-nav-bar');
 var React = require('react');
 var RouterMixin = require('react-mini-router').RouterMixin;
@@ -14,6 +15,16 @@ var Application = React.createClass({
 
     mixins: [RouterMixin, FluxMixin, StoreWatchMixin('ClientStore')],
 
+    componentDidMount: function() {
+        this.getFlux().actions.ClientActions.loadUser();
+    },
+
+    getInitialState: function() {
+        return {
+
+        };
+    },
+
     getStateFromFlux: function() {
         return {
             client: this.getFlux().store('ClientStore').getState()
@@ -22,6 +33,7 @@ var Application = React.createClass({
 
     routes: {
         '/': 'index',
+        '/clients/:nested': 'clients',
         '/music/:nested': 'music',
         '/music': 'music'
     },
@@ -40,6 +52,12 @@ var Application = React.createClass({
             <div>
                 <p>Application Index</p>
             </div>
+        );
+    },
+
+    clients: function() {
+        return (
+            <Clients path={this.state.path} root="/application/clients"/>
         );
     },
 

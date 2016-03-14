@@ -9,16 +9,33 @@ module.exports = function(router) {
   * Get Client based on an ID
   */
 
-  router.get("/:id", function(req, res) {
+  router.post("/:id/get", function(req, res) {
+
+
+      if (req.params.id === "current") {
+          return res.json({
+              status: true,
+              data: {
+                  client: ClientModel.getPortableFields(req.user)
+              }
+          });
+      }
 
     ClientModel.findById(req.params.id, {
       deleted: false
     }).then(function(client) {
       res.json({
-        client: client
+        status: true,
+        data: {
+            client: ClientModel.getPortableFields(client)
+        }
       });
     }).catch(function(error) {
-      res.json(error);
+      res.json({
+        status: false,
+        message: error.message,
+        data: error
+      });
     });
 
   });

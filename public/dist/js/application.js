@@ -62177,6 +62177,7 @@ module.exports = function(arr, fn, initial){
 },{}],505:[function(require,module,exports){
 
 var Music = require('./manager/views/music/index');
+var Clients = require('./manager/views/clients/index');
 var MainNavBar = require('./manager/views/music/components/common/main-nav-bar');
 var React = require('react');
 var RouterMixin = require('react-mini-router').RouterMixin;
@@ -62191,6 +62192,16 @@ var Application = React.createClass({displayName: "Application",
 
     mixins: [RouterMixin, FluxMixin, StoreWatchMixin('ClientStore')],
 
+    componentDidMount: function() {
+        this.getFlux().actions.ClientActions.loadUser();
+    },
+
+    getInitialState: function() {
+        return {
+
+        };
+    },
+
     getStateFromFlux: function() {
         return {
             client: this.getFlux().store('ClientStore').getState()
@@ -62199,6 +62210,7 @@ var Application = React.createClass({displayName: "Application",
 
     routes: {
         '/': 'index',
+        '/clients/:nested': 'clients',
         '/music/:nested': 'music',
         '/music': 'music'
     },
@@ -62217,6 +62229,12 @@ var Application = React.createClass({displayName: "Application",
             React.createElement("div", null, 
                 React.createElement("p", null, "Application Index")
             )
+        );
+    },
+
+    clients: function() {
+        return (
+            React.createElement(Clients, {path: this.state.path, root: "/application/clients"})
         );
     },
 
@@ -62251,13 +62269,23 @@ React.render(
     document.getElementById('application')
 );
 
-},{"./manager/actions/client-actions":506,"./manager/actions/music-actions":507,"./manager/stores/client-store":511,"./manager/stores/music-store":512,"./manager/views/music/components/common/main-nav-bar":513,"./manager/views/music/index":517,"fluxxor":1,"jquery":14,"react":501,"react-mini-router":339}],506:[function(require,module,exports){
+},{"./manager/actions/client-actions":506,"./manager/actions/music-actions":507,"./manager/stores/client-store":511,"./manager/stores/music-store":512,"./manager/views/clients/index":513,"./manager/views/music/components/common/main-nav-bar":514,"./manager/views/music/index":518,"fluxxor":1,"jquery":14,"react":501,"react-mini-router":339}],506:[function(require,module,exports){
 var constants = require('../constants');
 var clientService = require('../services/client-service');
 
 module.exports = {
 
-
+    loadUser : function() {
+        var _this = this;
+        this.dispatch(constants.LOAD_USER);
+        clientService.getClient(null, function(err, response) {
+            err = err || response.error;
+            if (err) {
+                return _this.dispatch(constants.LOAD_USER_FAILURE, err);
+            }
+            _this.dispatch(constants.LOAD_USER_SUCCESS, response.data.client);
+        });
+    }
 
 };
 
@@ -62309,6 +62337,14 @@ module.exports = {
     LIST_MUSIC_FAILURE : "LIST_MUSIC_FAILURE",
     LIST_MUSIC_SUCCESS : "LIST_MUSIC_SUCCESS",
 
+    LOAD_USER: "LOAD_USER",
+    LOAD_USER_FAILURE : "LOAD_USER_FAILURE",
+    LOAD_USER_SUCCESS : "LOAD_USER_SUCCESS",
+
+    LOAD_USERS: "LOAD_USERS",
+    LOAD_USERS_FAILURE : "LOAD_USERS_FAILURE",
+    LOAD_USERS_SUCCESS : "LOAD_USERS_SUCCESS",
+
     LOGOUT : "LOGOUT",
     LOGOUT_FAILURE : "LOGOUT_FAILURE",
     LOGOUT_SUCCESS : "LOGOUT_SUCCESS"
@@ -62320,12 +62356,12 @@ var request = require('superagent');
 
 module.exports = {
     getClient: function (id, callback) {
-
+        id = id || "current";
         request
-            .post('/application/clients/')
+            .post('/application/clients/'+id+"/get")
             .set('Accept', 'application/json')
             .end(function(error, res) {
-                console.log(res);
+                callback(error, res.body);
             });
 
     }
@@ -62370,14 +62406,46 @@ var _ = require('lodash');
 module.exports = Fluxxor.createStore({
     initialize: function(options) {
 
-        this.bindActions(
+        this.loading = false;
+        this.error = null;
+        this.clients = options.clients || {};
+        this.current = options.current || null;
 
+        this.bindActions(
+            constants.LOAD_USER, this.onGetUser,
+            constants.LOAD_USER_SUCCESS, this.onGetUserSuccess,
+            constants.LOAD_USER_FAILURE, this.onGetUserFailure
+
+            //constants.LOAD_USERS, this.onGetUsers,
+            //constants.LOAD_USERS_SUCCESS, this.onGetUsersSuccess,
+            //constants.LOAD_USERS_FAILURE, this.onGetUsersFailure
         );
+    },
+
+    onGetUser: function() {
+        this.loading = true;
+        this.emit("change");
+    },
+
+    onGetUserSuccess: function(payload) {
+        this.loading = false;
+        this.current = payload.id;
+        this.clients[this.current] = payload;
+        this.emit("change");
+    },
+
+    onGetUserFailure: function(payload) {
+        this.loading = false;
+        this.error = payload.error;
+        this.emit("change");
     },
 
     getState: function() {
         return {
-
+            loading: this.loading,
+            error: this.error,
+            current: this.current,
+            clients: this.clients
         };
     }
 });
@@ -62393,9 +62461,7 @@ module.exports = Fluxxor.createStore({
         this.loading = false;
         this.error = null;
         this.progress = {};
-        this.music = options.music || {
-
-            };
+        this.music = options.music || {};
 
         this.bindActions(
             constants.UPLOAD_MUSIC, this.onUploadMusic,
@@ -62467,8 +62533,74 @@ module.exports = Fluxxor.createStore({
 'use strict';
 
 var React = require('react');
+var RouterMixin = require('react-mini-router').RouterMixin;
+var Fluxxor = require('fluxxor');
+var StoreWatchMixin = Fluxxor.StoreWatchMixin;
+
+var Clients = React.createClass({displayName: "Clients",
+
+    mixins: [RouterMixin, Fluxxor.FluxMixin(React), StoreWatchMixin('ClientStore')],
+
+    routes: {
+        '/:id': 'profile',
+        '/list': 'list'
+    },
+
+
+    getInitialState: function() {
+        return {}
+    },
+
+    getStateFromFlux: function() {
+        var clientStoreState = this.getFlux().store('ClientStore').getState();
+        return {
+            client: clientStoreState.clients[clientStoreState.current] || {},
+            clients: clientStoreState.clients || []
+        }
+    },
+
+    render: function() {
+        this.state.path = this.props.path;
+        return this.renderCurrentRoute();
+    },
+
+    profile: function() {
+        return (
+             React.createElement("div", null, 
+                 React.createElement("p", null, "ID: ", this.state.client._id), 
+                 React.createElement("p", null, "Name: ", this.state.client.name), 
+                 React.createElement("p", null, "Email: ", this.state.client.email)
+             )
+        );
+    },
+
+    list: function() {
+        return (
+            React.createElement("div", null, 
+                React.createElement("p", null, "Clients List")
+            )
+        );
+    },
+
+    notFound: function(path) {
+        return (
+            React.createElement("div", null, 
+                React.createElement("h2", null, "404 Not Found"), 
+                React.createElement("p", null, path, " is not defined")
+            )
+        );
+    }
+});
+
+module.exports = Clients;
+
+},{"fluxxor":1,"react":501,"react-mini-router":339}],514:[function(require,module,exports){
+'use strict';
+
+var React = require('react');
 var _ = require('lodash');
 var Fluxxor = require('fluxxor');
+var StoreWatchMixin = Fluxxor.StoreWatchMixin;
 
 var Navbar = require('react-bootstrap').Navbar;
 var Nav = require('react-bootstrap').Nav;
@@ -62481,8 +62613,18 @@ var NavBrand = require('react-bootstrap').NavBrand;
 
 var MainNavBar = React.createClass({displayName: "MainNavBar",
 
-    mixins: [Fluxxor.FluxMixin(React)],
+    mixins: [Fluxxor.FluxMixin(React), StoreWatchMixin('ClientStore')],
 
+    getInitialState: function() {
+        return {}
+    },
+
+    getStateFromFlux: function() {
+        var clientStoreState = this.getFlux().store('ClientStore').getState();
+        return {
+            client: clientStoreState.clients[clientStoreState.current] || {}
+        }
+    },
 
     render: function() {
         return (
@@ -62492,7 +62634,7 @@ var MainNavBar = React.createClass({displayName: "MainNavBar",
                     React.createElement(NavItem, {eventKey: 2, href: "/application/music/upload"}, "Upload"), 
                     React.createElement(NavItem, {eventKey: 1, href: "/application/music/list"}, "Music List"), 
                     React.createElement(NavDropdown, {eventKey: 3, title: "Account", id: "collapsible-navbar-dropdown"}, 
-                        React.createElement(MenuItem, {href: "/application/clients/", eventKey: "1"}, "Andrew Apperley"), 
+                        React.createElement(MenuItem, {href: "/application/clients/"+this.state.client._id, eventKey: "1"}, this.state.client.name), 
                         React.createElement(MenuItem, {divider: true}), 
                         React.createElement(MenuItem, {href: "/logout", eventKey: "4"}, "Logout")
                     )
@@ -62505,7 +62647,7 @@ var MainNavBar = React.createClass({displayName: "MainNavBar",
 
 module.exports = MainNavBar;
 
-},{"fluxxor":1,"lodash":23,"react":501,"react-bootstrap":171}],514:[function(require,module,exports){
+},{"fluxxor":1,"lodash":23,"react":501,"react-bootstrap":171}],515:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -62548,7 +62690,7 @@ var List = React.createClass({displayName: "List",
 
 module.exports = List;
 
-},{"./music-list-component":515,"fluxxor":1,"react":501,"react-bootstrap":171}],515:[function(require,module,exports){
+},{"./music-list-component":516,"fluxxor":1,"react":501,"react-bootstrap":171}],516:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -62644,7 +62786,7 @@ var MusicListComponent = React.createClass({displayName: "MusicListComponent",
 
 module.exports = MusicListComponent;
 
-},{"lodash":23,"react":501,"react-bootstrap":171}],516:[function(require,module,exports){
+},{"lodash":23,"react":501,"react-bootstrap":171}],517:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -62727,7 +62869,7 @@ var Upload = React.createClass({displayName: "Upload",
 
 module.exports = Upload;
 
-},{"fluxxor":1,"lodash":23,"react":501,"react-bootstrap":171,"react-dropzone":337}],517:[function(require,module,exports){
+},{"fluxxor":1,"lodash":23,"react":501,"react-bootstrap":171,"react-dropzone":337}],518:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -62791,4 +62933,4 @@ var Music = React.createClass({displayName: "Music",
 
 module.exports = Music;
 
-},{"./components/list":514,"./components/upload":516,"fluxxor":1,"react":501,"react-mini-router":339}]},{},[505]);
+},{"./components/list":515,"./components/upload":517,"fluxxor":1,"react":501,"react-mini-router":339}]},{},[505]);

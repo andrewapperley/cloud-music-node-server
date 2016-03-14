@@ -3,6 +3,7 @@
 var React = require('react');
 var _ = require('lodash');
 var Fluxxor = require('fluxxor');
+var StoreWatchMixin = Fluxxor.StoreWatchMixin;
 
 var Navbar = require('react-bootstrap').Navbar;
 var Nav = require('react-bootstrap').Nav;
@@ -15,8 +16,18 @@ var NavBrand = require('react-bootstrap').NavBrand;
 
 var MainNavBar = React.createClass({
 
-    mixins: [Fluxxor.FluxMixin(React)],
+    mixins: [Fluxxor.FluxMixin(React), StoreWatchMixin('ClientStore')],
 
+    getInitialState: function() {
+        return {}
+    },
+
+    getStateFromFlux: function() {
+        var clientStoreState = this.getFlux().store('ClientStore').getState();
+        return {
+            client: clientStoreState.clients[clientStoreState.current] || {}
+        }
+    },
 
     render: function() {
         return (
@@ -26,7 +37,7 @@ var MainNavBar = React.createClass({
                     <NavItem eventKey={2} href="/application/music/upload">Upload</NavItem>
                     <NavItem eventKey={1} href="/application/music/list">Music List</NavItem>
                     <NavDropdown eventKey={3} title="Account" id="collapsible-navbar-dropdown">
-                        <MenuItem href="/application/clients/" eventKey="1">Andrew Apperley</MenuItem>
+                        <MenuItem href={"/application/clients/"+this.state.client._id} eventKey="1">{this.state.client.name}</MenuItem>
                         <MenuItem divider />
                         <MenuItem href="/logout" eventKey="4">Logout</MenuItem>
                     </NavDropdown>
