@@ -52347,15 +52347,26 @@ var clientService = require('../services/client-service');
 
 module.exports = {
 
-    loadUser : function() {
+    loadUser : function(id) {
         var _this = this;
         this.dispatch(constants.LOAD_USER);
-        clientService.getClient(null, function(err, response) {
+        clientService.getClient(id, function(err, response) {
             err = err || response.error;
             if (err) {
                 return _this.dispatch(constants.LOAD_USER_FAILURE, err);
             }
             _this.dispatch(constants.LOAD_USER_SUCCESS, response.data.client);
+        });
+    },
+    updateUser : function(id, changes) {
+        var _this = this;
+        this.dispatch(constants.UPDATE_USER, id);
+        clientService.updateClient(id, changes, function(err, response) {
+            err = err || response.error;
+            if (err) {
+                return _this.dispatch(constants.UPDATE_USER_FAILURE, err);
+            }
+            _this.dispatch(constants.UPDATE_USER_SUCCESS, response.data.client);
         });
     }
 
@@ -52417,6 +52428,10 @@ module.exports = {
     LOAD_USERS_FAILURE : "LOAD_USERS_FAILURE",
     LOAD_USERS_SUCCESS : "LOAD_USERS_SUCCESS",
 
+    UPDATE_USER: "UPDATE_USER",
+    UPDATE_USER_FAILURE : "UPDATE_USER_FAILURE",
+    UPDATE_USER_SUCCESS : "UPDATE_USER_SUCCESS",
+
     LOGOUT : "LOGOUT",
     LOGOUT_FAILURE : "LOGOUT_FAILURE",
     LOGOUT_SUCCESS : "LOGOUT_SUCCESS"
@@ -52431,6 +52446,18 @@ module.exports = {
         id = id || "current";
         request
             .post('/application/clients/'+id+"/get")
+            .set('Accept', 'application/json')
+            .end(function(error, res) {
+                callback(error, res.body);
+            });
+
+    },
+
+    updateClient: function (id, changes, callback) {
+        id = id || "current";
+        request
+            .post('/application/clients/'+id+"/update")
+            .send(changes)
             .set('Accept', 'application/json')
             .end(function(error, res) {
                 callback(error, res.body);
@@ -52486,7 +52513,11 @@ module.exports = Fluxxor.createStore({
         this.bindActions(
             constants.LOAD_USER, this.onGetUser,
             constants.LOAD_USER_SUCCESS, this.onGetUserSuccess,
-            constants.LOAD_USER_FAILURE, this.onGetUserFailure
+            constants.LOAD_USER_FAILURE, this.onGetUserFailure,
+
+            constants.UPDATE_USER, this.onUpdateUser,
+            constants.UPDATE_USER_SUCCESS, this.onUpdateUserSuccess,
+            constants.UPDATE_USER_FAILURE, this.onUpdateUserFailure
 
             //constants.LOAD_USERS, this.onGetUsers,
             //constants.LOAD_USERS_SUCCESS, this.onGetUsersSuccess,
@@ -52501,12 +52532,32 @@ module.exports = Fluxxor.createStore({
 
     onGetUserSuccess: function(payload) {
         this.loading = false;
-        this.current = payload.id;
+        this.current = payload._id;
         this.clients[this.current] = payload;
         this.emit("change");
     },
 
     onGetUserFailure: function(payload) {
+        this.loading = false;
+        this.error = payload.error;
+        this.emit("change");
+    },
+
+    onUpdateUser: function(id) {
+        this.loading = true;
+        this.clients[id].updating = true;
+        this.emit("change");
+    },
+
+    onUpdateUserSuccess: function(payload) {
+        this.loading = false;
+        this.clients[payload._id] = payload;
+        this.clients[payload._id].updating = false;
+        this.clients[payload._id].updated = true;
+        this.emit("change");
+    },
+
+    onUpdateUserFailure: function(payload) {
         this.loading = false;
         this.error = payload.error;
         this.emit("change");
@@ -52675,6 +52726,7 @@ var Row = require('react-bootstrap').Row;
 var Input = require('react-bootstrap').Input;
 var ButtonInput = require('react-bootstrap').ButtonInput;
 var FormControls = require('react-bootstrap').FormControls.Static;
+var Glyphicon = require('react-bootstrap').Glyphicon;
 
 var Profile = React.createClass({displayName: "Profile",
 
@@ -52706,17 +52758,29 @@ var Profile = React.createClass({displayName: "Profile",
         this.setState(change);
     },
 
-    render: function() {
+    onSubmit: function(e) {
+        e.preventDefault();
+        var formData = new FormData(e.target);
+        this.getFlux().actions.ClientActions.updateUser(this.props.client._id, formData);
+    },
 
+    render: function() {
+        var updatingContent = null;
+        if (this.props.client.updating) {
+            updatingContent = React.createElement(Glyphicon, {className: "loading", glyph: "refresh"});
+        } else if (this.props.client.updated) {
+            updatingContent = React.createElement(Glyphicon, {glyph: "ok"});
+        }
         return (
             React.createElement(Grid, null, 
                 React.createElement(Row, {classname: "centered-block"}, 
                     React.createElement(Col, null, 
-                        React.createElement("form", {className: "form-horizontal", action: this.props.client._id+"/update", method: "POST"}, 
+                        React.createElement("form", {className: "form-horizontal", onSubmit: this.onSubmit, method: "POST"}, 
                             React.createElement(FormControls, {label: "ID", value: this.props.client._id}), 
                             React.createElement(Input, {onChange: this.onInputChanged, type: "text", label: "Name", name: "name", value: this.state.client.name}), 
                             React.createElement(Input, {onChange: this.onInputChanged, type: "text", label: "Email", name: "email", value: this.state.client.email}), 
-                            React.createElement(ButtonInput, {disabled: !this.state.changed, type: "submit", value: "Update", bsSize: "medium"})
+                            React.createElement(ButtonInput, {disabled: !this.state.changed, type: "submit", value: "Update", bsSize: "medium"}), 
+                            updatingContent
                         )
                     )
                 )

@@ -10,5 +10,17 @@ module.exports = {
                 callback(error, res.body);
             });
 
+    },
+
+    updateClient: function (id, changes, callback) {
+        id = id || "current";
+        request
+            .post('/application/clients/'+id+"/update")
+            .send(changes)
+            .set('Accept', 'application/json')
+            .end(function(error, res) {
+                callback(error, res.body);
+            });
+
     }
 };

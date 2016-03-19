@@ -1,5 +1,14 @@
 @import "../../node_modules/bootstrap/less/bootstrap.less";
 
+.loading {
+  -webkit-animation: rotation 0.4s infinite linear;
+
+  @keyframes rotation {
+    from {transform: rotate(0deg);}
+    to   {transform: rotate(359deg);}
+  }
+}
+
 .dropzone-upload-container {
   margin: 0 auto;
   width: 90%;

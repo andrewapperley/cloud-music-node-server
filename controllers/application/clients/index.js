@@ -63,7 +63,9 @@ module.exports = function(router) {
           res.json({
             status: true,
             message: "Client was updated successfully",
-            data: ClientModel.getPortableFields(client)
+            data: {
+                client: ClientModel.getPortableFields(client)
+            }
           })
         });
       } else {
