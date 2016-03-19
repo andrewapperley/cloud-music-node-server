@@ -5,6 +5,8 @@ var RouterMixin = require('react-mini-router').RouterMixin;
 var Fluxxor = require('fluxxor');
 var StoreWatchMixin = Fluxxor.StoreWatchMixin;
 
+var Profile = require('./profile');
+
 var Clients = React.createClass({
 
     mixins: [RouterMixin, Fluxxor.FluxMixin(React), StoreWatchMixin('ClientStore')],
@@ -34,11 +36,7 @@ var Clients = React.createClass({
 
     profile: function() {
         return (
-             <div>
-                 <p>ID: {this.state.client._id}</p>
-                 <p>Name: {this.state.client.name}</p>
-                 <p>Email: {this.state.client.email}</p>
-             </div>
+            <Profile client={this.state.client} />
         );
     },
 

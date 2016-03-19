@@ -62269,7 +62269,7 @@ React.render(
     document.getElementById('application')
 );
 
-},{"./manager/actions/client-actions":506,"./manager/actions/music-actions":507,"./manager/stores/client-store":511,"./manager/stores/music-store":512,"./manager/views/clients/index":513,"./manager/views/music/components/common/main-nav-bar":514,"./manager/views/music/index":518,"fluxxor":1,"jquery":14,"react":501,"react-mini-router":339}],506:[function(require,module,exports){
+},{"./manager/actions/client-actions":506,"./manager/actions/music-actions":507,"./manager/stores/client-store":511,"./manager/stores/music-store":512,"./manager/views/clients/index":513,"./manager/views/music/components/common/main-nav-bar":515,"./manager/views/music/index":519,"fluxxor":1,"jquery":14,"react":501,"react-mini-router":339}],506:[function(require,module,exports){
 var constants = require('../constants');
 var clientService = require('../services/client-service');
 
@@ -62537,6 +62537,8 @@ var RouterMixin = require('react-mini-router').RouterMixin;
 var Fluxxor = require('fluxxor');
 var StoreWatchMixin = Fluxxor.StoreWatchMixin;
 
+var Profile = require('./profile');
+
 var Clients = React.createClass({displayName: "Clients",
 
     mixins: [RouterMixin, Fluxxor.FluxMixin(React), StoreWatchMixin('ClientStore')],
@@ -62566,11 +62568,7 @@ var Clients = React.createClass({displayName: "Clients",
 
     profile: function() {
         return (
-             React.createElement("div", null, 
-                 React.createElement("p", null, "ID: ", this.state.client._id), 
-                 React.createElement("p", null, "Name: ", this.state.client.name), 
-                 React.createElement("p", null, "Email: ", this.state.client.email)
-             )
+            React.createElement(Profile, {client: this.state.client})
         );
     },
 
@@ -62594,7 +62592,70 @@ var Clients = React.createClass({displayName: "Clients",
 
 module.exports = Clients;
 
-},{"fluxxor":1,"react":501,"react-mini-router":339}],514:[function(require,module,exports){
+},{"./profile":514,"fluxxor":1,"react":501,"react-mini-router":339}],514:[function(require,module,exports){
+'use strict';
+
+var React = require('react');
+var Fluxxor = require('fluxxor');
+var Grid = require('react-bootstrap').Grid;
+var Col = require('react-bootstrap').Col;
+var Row = require('react-bootstrap').Row;
+var Input = require('react-bootstrap').Input;
+var ButtonInput = require('react-bootstrap').ButtonInput;
+var FormControls = require('react-bootstrap').FormControls.Static;
+
+var Profile = React.createClass({displayName: "Profile",
+
+    mixins: [Fluxxor.FluxMixin(React)],
+
+    getInitialState: function() {
+        return {
+            changed: false,
+            client: {}
+        };
+    },
+
+    componentWillReceiveProps: function(props) {
+        this.setState({
+            client: props.client
+        });
+    },
+
+    componentDidMount: function() {
+        this.setState({
+            client: this.props.client
+        });
+    },
+
+    onInputChanged: function(e) {
+        var change = this.state;
+        change.changed = true;
+        change.client[e.target.name] = e.target.value;
+        this.setState(change);
+    },
+
+    render: function() {
+
+        return (
+            React.createElement(Grid, null, 
+                React.createElement(Row, {classname: "centered-block"}, 
+                    React.createElement(Col, null, 
+                        React.createElement("form", {className: "form-horizontal", action: this.props.client._id+"/update", method: "POST"}, 
+                            React.createElement(FormControls, {label: "ID", value: this.props.client._id}), 
+                            React.createElement(Input, {onChange: this.onInputChanged, type: "text", label: "Name", name: "name", value: this.state.client.name}), 
+                            React.createElement(Input, {onChange: this.onInputChanged, type: "text", label: "Email", name: "email", value: this.state.client.email}), 
+                            React.createElement(ButtonInput, {disabled: !this.state.changed, type: "submit", value: "Update", bsSize: "medium"})
+                        )
+                    )
+                )
+            )
+        );
+    }
+});
+
+module.exports = Profile;
+
+},{"fluxxor":1,"react":501,"react-bootstrap":171}],515:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -62647,7 +62708,7 @@ var MainNavBar = React.createClass({displayName: "MainNavBar",
 
 module.exports = MainNavBar;
 
-},{"fluxxor":1,"lodash":23,"react":501,"react-bootstrap":171}],515:[function(require,module,exports){
+},{"fluxxor":1,"lodash":23,"react":501,"react-bootstrap":171}],516:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -62690,7 +62751,7 @@ var List = React.createClass({displayName: "List",
 
 module.exports = List;
 
-},{"./music-list-component":516,"fluxxor":1,"react":501,"react-bootstrap":171}],516:[function(require,module,exports){
+},{"./music-list-component":517,"fluxxor":1,"react":501,"react-bootstrap":171}],517:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -62786,7 +62847,7 @@ var MusicListComponent = React.createClass({displayName: "MusicListComponent",
 
 module.exports = MusicListComponent;
 
-},{"lodash":23,"react":501,"react-bootstrap":171}],517:[function(require,module,exports){
+},{"lodash":23,"react":501,"react-bootstrap":171}],518:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -62869,7 +62930,7 @@ var Upload = React.createClass({displayName: "Upload",
 
 module.exports = Upload;
 
-},{"fluxxor":1,"lodash":23,"react":501,"react-bootstrap":171,"react-dropzone":337}],518:[function(require,module,exports){
+},{"fluxxor":1,"lodash":23,"react":501,"react-bootstrap":171,"react-dropzone":337}],519:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -62933,4 +62994,4 @@ var Music = React.createClass({displayName: "Music",
 
 module.exports = Music;
 
-},{"./components/list":515,"./components/upload":517,"fluxxor":1,"react":501,"react-mini-router":339}]},{},[505]);
+},{"./components/list":516,"./components/upload":518,"fluxxor":1,"react":501,"react-mini-router":339}]},{},[505]);

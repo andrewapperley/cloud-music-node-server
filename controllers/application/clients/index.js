@@ -45,9 +45,8 @@ module.exports = function(router) {
   */
 
   router.post("/:id/update", function(req, res) {
-    var changes = req.body.changes;
 
-    if (_.isEmpty(changes)) {
+    if (_.isEmpty(req.body)) {
       return res.json({
         status: false,
         message: "No changes to update client with.",
@@ -59,12 +58,12 @@ module.exports = function(router) {
       deleted: false
     }).then(function(client) {
       if (client) {
-        client = client.updateWithChanges(changes);
+        ClientModel.updateWithChanges(client, req.body);
         client.save().then(function(client) {
           res.json({
             status: true,
             message: "Client was updated successfully",
-            data: client
+            data: ClientModel.getPortableFields(client)
           })
         });
       } else {

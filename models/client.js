@@ -26,7 +26,6 @@ module.exports = function() {
                 console.log("Web Client attempted to update: " + key + " on Client: " + client._id);
             }
         });
-        return client;
     };
 
     client.validateName = function(name) {
