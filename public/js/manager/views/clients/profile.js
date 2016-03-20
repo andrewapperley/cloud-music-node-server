@@ -8,7 +8,6 @@ var Row = require('react-bootstrap').Row;
 var Input = require('react-bootstrap').Input;
 var ButtonInput = require('react-bootstrap').ButtonInput;
 var FormControls = require('react-bootstrap').FormControls.Static;
-var Glyphicon = require('react-bootstrap').Glyphicon;
 
 var Profile = React.createClass({
 
@@ -47,11 +46,11 @@ var Profile = React.createClass({
     },
 
     render: function() {
-        var updatingContent = null;
+        var updateLoader = <span>Update</span>;
         if (this.props.client.updating) {
-            updatingContent = <Glyphicon className="loading" glyph="refresh" />;
+            updateLoader = <span>Updating <span className="loading glyphicon glyphicon-refresh"/></span>;
         } else if (this.props.client.updated) {
-            updatingContent = <Glyphicon glyph="ok" />;
+            updateLoader = <span>Updated <span className="glyphicon glyphicon-ok"/></span>;
         }
         return (
             <Grid>
@@ -61,8 +60,7 @@ var Profile = React.createClass({
                             <FormControls label="ID" value={this.props.client._id} />
                             <Input onChange={this.onInputChanged} type="text" label="Name" name="name" value={this.state.client.name} />
                             <Input onChange={this.onInputChanged} type="text" label="Email" name="email" value={this.state.client.email} />
-                            <ButtonInput disabled={!this.state.changed} type="submit" value="Update" bsSize="medium" />
-                            {updatingContent}
+                            <button disabled={!this.state.changed} type="submit" className="btn btn-default">{updateLoader}</button>
                         </form>
                     </Col>
                 </Row>

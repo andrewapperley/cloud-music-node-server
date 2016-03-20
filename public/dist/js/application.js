@@ -62654,7 +62654,6 @@ var Row = require('react-bootstrap').Row;
 var Input = require('react-bootstrap').Input;
 var ButtonInput = require('react-bootstrap').ButtonInput;
 var FormControls = require('react-bootstrap').FormControls.Static;
-var Glyphicon = require('react-bootstrap').Glyphicon;
 
 var Profile = React.createClass({displayName: "Profile",
 
@@ -62693,11 +62692,11 @@ var Profile = React.createClass({displayName: "Profile",
     },
 
     render: function() {
-        var updatingContent = null;
+        var updateLoader = React.createElement("span", null, "Update");
         if (this.props.client.updating) {
-            updatingContent = React.createElement(Glyphicon, {className: "loading", glyph: "refresh"});
+            updateLoader = React.createElement("span", null, "Updating ", React.createElement("span", {className: "loading glyphicon glyphicon-refresh"}));
         } else if (this.props.client.updated) {
-            updatingContent = React.createElement(Glyphicon, {glyph: "ok"});
+            updateLoader = React.createElement("span", null, "Updated ", React.createElement("span", {className: "glyphicon glyphicon-ok"}));
         }
         return (
             React.createElement(Grid, null, 
@@ -62707,8 +62706,7 @@ var Profile = React.createClass({displayName: "Profile",
                             React.createElement(FormControls, {label: "ID", value: this.props.client._id}), 
                             React.createElement(Input, {onChange: this.onInputChanged, type: "text", label: "Name", name: "name", value: this.state.client.name}), 
                             React.createElement(Input, {onChange: this.onInputChanged, type: "text", label: "Email", name: "email", value: this.state.client.email}), 
-                            React.createElement(ButtonInput, {disabled: !this.state.changed, type: "submit", value: "Update", bsSize: "medium"}), 
-                            updatingContent
+                            React.createElement("button", {disabled: !this.state.changed, type: "submit", className: "btn btn-default"}, updateLoader)
                         )
                     )
                 )
